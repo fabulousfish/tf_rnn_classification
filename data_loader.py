@@ -72,7 +72,9 @@ def build_vocab(train_dir, vocab_dir, vocab_size=5000):
 
 
 def read_vocab(vocab_dir):
-    """读取词汇表"""
+    """
+    读取词汇表
+    """
     # words = open_file(vocab_dir).read().strip().split('\n')
     with open_file(vocab_dir) as fp:
         # 如果是py2 则每个值都转化为unicode
@@ -82,7 +84,9 @@ def read_vocab(vocab_dir):
 
 
 def read_category():
-    """读取分类目录，固定"""
+    """
+    读取分类目录，固定
+    """
     categories = ['体育', '财经', '房产', '家居', '教育', '科技', '时尚', '时政', '游戏', '娱乐']
 
     categories = [native_content(x) for x in categories]

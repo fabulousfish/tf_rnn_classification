@@ -15,23 +15,28 @@ from rnn_model import TRNNConfig, TextRNN
 from data_loader import read_vocab, read_category, batch_iter, process_file, build_vocab
 
 base_dir = 'data'
-train_dir = os.path.join(base_dir, 'cnews.train.txt')
-test_dir = os.path.join(base_dir, 'cnews.test.txt')
-val_dir = os.path.join(base_dir, 'cnews.val.txt')
-vocab_dir = os.path.join(base_dir, 'cnews.vocab.txt')
+train_dir = os.path.join(base_dir, 'cnews.train.txt')  # 训练数据路径
+test_dir = os.path.join(base_dir, 'cnews.test.txt')  # 测试数据路径
+val_dir = os.path.join(base_dir, 'cnews.val.txt')  # 验证数据路径
+vocab_dir = os.path.join(base_dir, 'cnews.vocab.txt')  # 词典路径
 
 save_dir = 'checkpoints/textrnn'
 save_path = os.path.join(save_dir, 'best_validation')  # 最佳验证结果保存路径
 
 
 def get_time_dif(start_time):
-    """获取已使用时间"""
+    """
+    获取已使用时间
+    """
     end_time = time.time()
     time_dif = end_time - start_time
     return timedelta(seconds=int(round(time_dif)))
 
 
 def feed_data(x_batch, y_batch, keep_prob):
+    """
+    江数据打包格式化
+    """
     feed_dict = {
         model.input_x: x_batch,
         model.input_y: y_batch,
@@ -41,24 +46,31 @@ def feed_data(x_batch, y_batch, keep_prob):
 
 
 def evaluate(sess, x_, y_):
-    """评估在某一数据上的准确率和损失"""
+    """
+    评估在某一数据上的准确率和损失
+    """
     data_len = len(x_)
+    # 获取能够迭代的数据器
     batch_eval = batch_iter(x_, y_, 128)
     total_loss = 0.0
     total_acc = 0.0
     for x_batch, y_batch in batch_eval:
         batch_len = len(x_batch)
         feed_dict = feed_data(x_batch, y_batch, 1.0)
+        # 在当前模型下进行损失和准确率的判断
         loss, acc = sess.run([model.loss, model.acc], feed_dict=feed_dict)
         total_loss += loss * batch_len
         total_acc += acc * batch_len
-
+    # 返回平均的损失和准确率
     return total_loss / data_len, total_acc / data_len
 
 
 def train():
+    """
+    训练模型
+    """
     print("Configuring TensorBoard and Saver...")
-    # 配置 Tensorboard，重新训练时，请将tensorboard文件夹删除，不然图会覆盖
+    # 配置 Tensorboard，重新训练时，需要将tensorboard文件夹删除，不然图会覆盖
     tensorboard_dir = 'tensorboard/textrnn'
     if not os.path.exists(tensorboard_dir):
         os.makedirs(tensorboard_dir)
@@ -68,7 +80,7 @@ def train():
     merged_summary = tf.summary.merge_all()
     writer = tf.summary.FileWriter(tensorboard_dir)
 
-    # 配置 Saver
+    # 配置Saver,保存模型
     saver = tf.train.Saver()
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
@@ -86,6 +98,7 @@ def train():
     session.run(tf.global_variables_initializer())
     writer.add_graph(session.graph)
 
+    # 准备开始训练，初始化参数
     print('Training and evaluating...')
     start_time = time.time()
     total_batch = 0  # 总批次
