@@ -14,13 +14,13 @@ from sklearn import metrics
 from rnn_model import TRNNConfig, TextRNN
 from data_loader import read_vocab, read_category, batch_iter, process_file, build_vocab
 
-base_dir = 'data'
-train_dir = os.path.join(base_dir, 'cnews.train.txt')  # 训练数据路径
-test_dir = os.path.join(base_dir, 'cnews.test.txt')  # 测试数据路径
-val_dir = os.path.join(base_dir, 'cnews.val.txt')  # 验证数据路径
-vocab_dir = os.path.join(base_dir, 'cnews.vocab.txt')  # 词典路径
+base_dir = 'data_query'
+train_dir = os.path.join(base_dir, 'query_train')  # 训练数据路径
+test_dir = os.path.join(base_dir, 'query_test')  # 测试数据路径
+val_dir = os.path.join(base_dir, 'query_val')  # 验证数据路径
+vocab_dir = os.path.join(base_dir, 'query_vocab')  # 词典路径
 
-save_dir = 'checkpoints/textrnn'
+save_dir = 'query_model/model'
 save_path = os.path.join(save_dir, 'best_validation')  # 最佳验证结果保存路径
 
 
@@ -71,7 +71,7 @@ def train():
     """
     print("Configuring TensorBoard and Saver...")
     # 配置 Tensorboard，重新训练时，需要将tensorboard文件夹删除，不然图会覆盖
-    tensorboard_dir = 'tensorboard/textrnn'
+    tensorboard_dir = 'myself_experiments/performance/textrnn'
     if not os.path.exists(tensorboard_dir):
         os.makedirs(tensorboard_dir)
 
@@ -151,6 +151,10 @@ def train():
 
 
 def test():
+    """
+    测试模型
+    :return:
+    """
     print("Loading test data...")
     start_time = time.time()
     x_test, y_test = process_file(test_dir, word_to_id, cat_to_id, config.seq_length)
@@ -195,8 +199,8 @@ def test():
 
 if __name__ == '__main__':
     # 判断是进行训练模型或者测试模型
-    if len(sys.argv) != 2 or sys.argv[1] not in ['train', 'test']:
-        raise ValueError("""usage: python run_rnn.py [train / test]""")
+    # if len(sys.argv) != 2 or sys.argv[1] not in ['train', 'test']:
+    #     raise ValueError("""usage: python run_rnn.py [train / test]""")
 
     print('Configuring RNN model...')
     # 初始化参数类
@@ -209,8 +213,10 @@ if __name__ == '__main__':
     config.vocab_size = len(words)
     #　建立rnn模型类
     model = TextRNN(config)
-
+    train()
+    """
     if sys.argv[1] == 'train':
         train()
     else:
         test()
+    """
