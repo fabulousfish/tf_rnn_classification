@@ -62,7 +62,7 @@ def build_vocab(train_dir, vocab_dir, vocab_size=5000):
     all_data = []
     for content in data_train:
         all_data.extend(content)
-
+    # 无序容器（字典格式）
     counter = Counter(all_data)
     count_pairs = counter.most_common(vocab_size - 1)
     words, _ = list(zip(*count_pairs))
@@ -87,7 +87,8 @@ def read_category():
     """
     读取分类目录，固定
     """
-    categories = ['体育', '财经', '房产', '家居', '教育', '科技', '时尚', '时政', '游戏', '娱乐']
+    # categories = ['体育', '财经', '房产', '家居', '教育', '科技', '时尚', '时政', '游戏', '娱乐']
+    categories = ['where', 'who', 'when', 'which', 'how_many', 'what', 'how', 'why', 'yes_no']
 
     categories = [native_content(x) for x in categories]
 
@@ -101,7 +102,7 @@ def to_words(content, words):
     return ''.join(words[x] for x in content)
 
 
-def process_file(filename, word_to_id, cat_to_id, max_length=600):
+def process_file(filename, word_to_id, cat_to_id, max_length=15):
     """将文件转换为id表示"""
     contents, labels = read_file(filename)
 
@@ -117,11 +118,14 @@ def process_file(filename, word_to_id, cat_to_id, max_length=600):
     return x_pad, y_pad
 
 
-def batch_iter(x, y, batch_size=64):
-    """生成批次数据"""
+def batch_iter(x, y, batch_size=20):
+    """
+    生成批次数据
+    """
     data_len = len(x)
     num_batch = int((data_len - 1) / batch_size) + 1
 
+    # 打乱数据顺序
     indices = np.random.permutation(np.arange(data_len))
     x_shuffle = x[indices]
     y_shuffle = y[indices]
